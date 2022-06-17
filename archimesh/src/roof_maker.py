@@ -87,15 +87,15 @@ class ROOF(bpy.types.Operator):
                 tilesize_x = 0.184
                 tilesize_y = 0.413
 
-            if self.model == "2":
+            elif self.model == "2":
                 tilesize_x = 0.103
                 tilesize_y = 0.413
 
-            if self.model == "3":
+            elif self.model == "3":
                 tilesize_x = 0.184
                 tilesize_y = 0.434
 
-            if self.model == "4":
+            elif self.model == "4":
                 tilesize_x = 0.231
                 tilesize_y = 0.39
 
@@ -163,15 +163,11 @@ def create_roof_mesh(self):
         a_x = 0.85
         a_y = 0.85
 
-    if self.model == "2":
+    elif self.model == "2":
         a_x = 0.90
         a_y = 0.85
 
-    if self.model == "3":
-        a_x = 0.80
-        a_y = 0.85
-
-    if self.model == "4":
+    elif self.model in ["3", "4"]:
         a_x = 0.80
         a_y = 0.85
 
@@ -199,17 +195,14 @@ def create_roof_mesh(self):
 # ------------------------------------------------------------------------------
 def create_roof(self):
     # Retry mesh data
-    if self.model == "1":
+    if self.model == "1" or self.model not in ["2", "3", "4"]:
         mydata = tile_model_01()
     elif self.model == "2":
         mydata = tile_model_02()
     elif self.model == "3":
         mydata = tile_model_03()
-    elif self.model == "4":
-        mydata = tile_model_04()
     else:
-        mydata = tile_model_01()  # default model
-
+        mydata = tile_model_04()
     # move data
     verts = mydata[0]
     faces = mydata[1]

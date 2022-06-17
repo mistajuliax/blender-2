@@ -343,10 +343,7 @@ class DoorObjectgeneratorpanel(bpy.types.Panel):
         o = context.object
         if o is None:
             return False
-        if 'DoorObjectGenerator' not in o:
-            return False
-        else:
-            return True
+        return 'DoorObjectGenerator' in o
 
     # -----------------------------------------------------
     # Draw (create UI interface)
@@ -482,7 +479,7 @@ def make_one_door(self, myframe, width, openside):
             mat = create_glossy_material("Handle_material", False, 0.733, 0.779, 0.8)
             set_material(handle1, mat)
             set_material(handle2, mat)
-        if self.model == "5" or self.model == "6":
+        if self.model in ["5", "6"]:
             mat = create_glass_material("DoorGlass_material", False)
             mydoor.data.materials.append(mat)
             if self.model == "5":
@@ -555,17 +552,14 @@ def create_door_data(self, myframe, width, openside):
 # ------------------------------------------------------------------------------
 def create_handle(self, mydoor, pos, frame_width, openside):
     # Retry mesh data
-    if self.handle == "1":
+    if self.handle == "1" or self.handle not in ["2", "3", "4"]:
         mydata = handle_model_01()
     elif self.handle == "2":
         mydata = handle_model_02()
     elif self.handle == "3":
         mydata = handle_model_03()
-    elif self.handle == "4":
-        mydata = handle_model_04()
     else:
-        mydata = handle_model_01()  # default model
-
+        mydata = handle_model_04()
     # move data
     verts = mydata[0]
     faces = mydata[1]
@@ -575,21 +569,15 @@ def create_handle(self, mydoor, pos, frame_width, openside):
     wf = frame_width - (sf * 2) - (gap * 2)
     deep = (self.frame_thick * 0.50) - (gap * 3)
     # Open to right or left
-    if openside == "1":
-        side = -1
-    else:
-        side = 1
-
-    mymesh = bpy.data.meshes.new("Handle_" + pos)
-    myobject = bpy.data.objects.new("Handle_" + pos, mymesh)
+    side = -1 if openside == "1" else 1
+    mymesh = bpy.data.meshes.new(f"Handle_{pos}")
+    myobject = bpy.data.objects.new(f"Handle_{pos}", mymesh)
 
     myobject.location = bpy.context.scene.cursor_location
     bpy.context.scene.objects.link(myobject)
 
     mymesh.from_pydata(verts, [], faces)
     mymesh.update(calc_edges=True)
-    # Rotate if pos is front
-    xrot = 0.0
     yrot = 0.0
     if self.handle == "1":
         if openside != "1":
@@ -597,40 +585,22 @@ def create_handle(self, mydoor, pos, frame_width, openside):
     else:
         yrot = 0.0
 
-    if pos == "Front":
-        xrot = math.pi
-
+    xrot = math.pi if pos == "Front" else 0.0
     myobject.rotation_euler = (xrot, yrot, 0.0)  # radians PI=180
 
     # Translate to door and parent (depend of model of door)
     if self.model == "1":
         myobject.location.x = (wf * side) + (0.072 * side * -1)
-        if pos == "Front":
-            myobject.location.y = deep - 0.005
-        else:
-            myobject.location.y = 0.005
-
-    if self.model == "2" or self.model == "6":
+        myobject.location.y = deep - 0.005 if pos == "Front" else 0.005
+    if self.model in ["2", "6"]:
         myobject.location.x = (wf * side) + (0.060 * side * -1)
-        if pos == "Front":
-            myobject.location.y = deep - 0.011
-        else:
-            myobject.location.y = 0.00665
-
+        myobject.location.y = deep - 0.011 if pos == "Front" else 0.00665
     if self.model == "3":
         myobject.location.x = (wf * side) + (0.060 * side * -1)
-        if pos == "Front":
-            myobject.location.y = deep - 0.011
-        else:
-            myobject.location.y = 0.00665
-
-    if self.model == "4" or self.model == "5":
+        myobject.location.y = deep - 0.011 if pos == "Front" else 0.00665
+    if self.model in ["4", "5"]:
         myobject.location.x = (wf * side) + (0.060 * side * -1)
-        if pos == "Front":
-            myobject.location.y = deep - 0.011
-        else:
-            myobject.location.y = 0.00665
-
+        myobject.location.y = deep - 0.011 if pos == "Front" else 0.00665
     myobject.location.z = 0
     myobject.parent = mydoor
     myobject.lock_rotation = (True, False, True)
@@ -679,7 +649,7 @@ def door_model_01(frame_size, frame_width, frame_height, frame_thick, openside):
     myfaces = [(4, 5, 1, 0), (5, 6, 2, 1), (6, 7, 3, 2), (7, 4, 0, 3), (0, 1, 2, 3),
                (7, 6, 5, 4)]
 
-    return myvertex, myfaces, wf, deep, side
+    return myvertex, myfaces, wf, maxy, side
 
 
 # ----------------------------------------------
@@ -828,7 +798,7 @@ def door_model_02(frame_size, frame_width, frame_height, frame_thick, openside):
                (1, 49, 53, 5), (49, 1, 9, 57), (57, 9, 17, 65), (0, 48, 65, 17), (48, 0, 4, 52),
                (52, 4, 19, 67), (12, 60, 67, 19), (3, 51, 60, 12), (2, 50, 51, 3)]
 
-    return myvertex, myfaces, wf, deep, side
+    return myvertex, myfaces, wf, maxy, side
 
 
 # ----------------------------------------------

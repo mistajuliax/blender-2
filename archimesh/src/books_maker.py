@@ -174,12 +174,27 @@ def generate_books(self):
             i = 0
             ot = -1
 
-        mydata = create_book("Book" + str(x),
-                             self.width, self.depth, self.height,
-                             lastx, myloc.y, myloc.z,
-                             self.crt_mat,
-                             self.rX, self.rY, self.rZ, self.rot, ox, oy, oz, ot,
-                             self.objcol, self.rC)
+        mydata = create_book(
+            f"Book{str(x)}",
+            self.width,
+            self.depth,
+            self.height,
+            lastx,
+            myloc.y,
+            myloc.z,
+            self.crt_mat,
+            self.rX,
+            self.rY,
+            self.rZ,
+            self.rot,
+            ox,
+            oy,
+            oz,
+            ot,
+            self.objcol,
+            self.rC,
+        )
+
         boxes.extend([mydata[0]])
         bookdata = mydata[1]
 
@@ -296,38 +311,49 @@ def create_book(objname, sx, sy, sz, px, py, pz, mat, frx,
         # Convert random color
         objcol = colorsys.hsv_to_rgb(hue, hsv[1], hsv[2])
 
-    myvertex = []
-    myfaces = []
     x = 0
-    # Left side
-    myvertex.extend([(x, -sy, 0), (0, 0, 0), (x, 0, sz), (x, -sy, sz)])
-    myfaces.extend([(0, 1, 2, 3)])
-
-    myvertex.extend([(x + gap, -sy + gap, 0), (x + gap, 0, 0), (x + gap, 0, sz),
-                     (x + gap, -sy + gap, sz)])
-    myfaces.extend([(4, 5, 6, 7)])
+    myvertex = [
+        (x, -sy, 0),
+        (0, 0, 0),
+        (x, 0, sz),
+        (x, -sy, sz),
+        *[
+            (x + gap, -sy + gap, 0),
+            (x + gap, 0, 0),
+            (x + gap, 0, sz),
+            (x + gap, -sy + gap, sz),
+        ],
+    ]
 
     # Right side
     x = sx - gap
     myvertex.extend([(x, -sy + gap, 0), (x, 0, 0), (x, 0, sz), (x, -sy + gap, sz)])
-    myfaces.extend([(8, 9, 10, 11)])
-
     myvertex.extend([(x + gap, -sy, 0), (x + gap, 0, 0), (x + gap, 0, sz), (x + gap, -sy, sz)])
-    myfaces.extend([(12, 13, 14, 15)])
-
-    myfaces.extend(
-        [(0, 12, 15, 3), (4, 8, 11, 7), (3, 15, 11, 7), (0, 12, 8, 4), (0, 1, 5, 4),
-         (8, 9, 13, 12), (3, 2, 6, 7),
-         (11, 10, 14, 15), (1, 2, 6, 5), (9, 10, 14, 13)])
-
     # Top inside
     myvertex.extend([(gap, -sy + gap, sz - gap), (gap, -gap, sz - gap), (sx - gap, -gap, sz - gap),
                      (sx - gap, -sy + gap, sz - gap)])
-    myfaces.extend([(16, 17, 18, 19)])
-
     # bottom inside and front face
     myvertex.extend([(gap, -sy + gap, gap), (gap, -gap, gap), (sx - gap, -gap, gap), (sx - gap, -sy + gap, gap)])
-    myfaces.extend([(20, 21, 22, 23), (17, 18, 22, 21)])
+    myfaces = [
+        (0, 1, 2, 3),
+        *[(4, 5, 6, 7)],
+        *[(8, 9, 10, 11)],
+        *[
+            (12, 13, 14, 15),
+            (0, 12, 15, 3),
+            (4, 8, 11, 7),
+            (3, 15, 11, 7),
+            (0, 12, 8, 4),
+            (0, 1, 5, 4),
+            (8, 9, 13, 12),
+            (3, 2, 6, 7),
+            (11, 10, 14, 15),
+            (1, 2, 6, 5),
+            (9, 10, 14, 13),
+        ],
+        *[(16, 17, 18, 19)],
+        *[(20, 21, 22, 23), (17, 18, 22, 21)],
+    ]
 
     mymesh = bpy.data.meshes.new(objname)
     mybook = bpy.data.objects.new(objname, mymesh)
@@ -346,7 +372,18 @@ def create_book(objname, sx, sy, sz, px, py, pz, mat, frx,
     if mat:
         rgb = objcol
         # External
-        mat = create_diffuse_material(objname + "_material", True, rgb[0], rgb[1], rgb[2], rgb[0], rgb[1], rgb[2], 0.05)
+        mat = create_diffuse_material(
+            f"{objname}_material",
+            True,
+            rgb[0],
+            rgb[1],
+            rgb[2],
+            rgb[0],
+            rgb[1],
+            rgb[2],
+            0.05,
+        )
+
         set_material(mybook, mat)
         # UV unwrap external
         select_faces(mybook, 0, True)
@@ -354,7 +391,18 @@ def create_book(objname, sx, sy, sz, px, py, pz, mat, frx,
         select_faces(mybook, 4, False)
         unwrap_mesh(mybook, False)
         # Add Internal
-        mat = create_diffuse_material(objname + "_side_material", True, 0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.03)
+        mat = create_diffuse_material(
+            f"{objname}_side_material",
+            True,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.3,
+            0.03,
+        )
+
         mybook.data.materials.append(mat)
         select_faces(mybook, 14, True)
         select_faces(mybook, 15, False)

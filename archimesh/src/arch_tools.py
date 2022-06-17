@@ -110,21 +110,9 @@ def set_modifier_mirror(myobject, axis="Y"):
         bpy.ops.object.modifier_add(type='MIRROR')
         for mod in myobject.modifiers:
             if mod.type == 'MIRROR':
-                if axis == "X":
-                    mod.use_x = True
-                else:
-                    mod.use_x = False
-
-                if axis == "Y":
-                    mod.use_y = True
-                else:
-                    mod.use_y = False
-
-                if axis == "Z":
-                    mod.use_z = True
-                else:
-                    mod.use_z = False
-
+                mod.use_x = axis == "X"
+                mod.use_y = axis == "Y"
+                mod.use_z = axis == "Z"
                 mod.use_clip = True
 
 
@@ -138,26 +126,25 @@ def set_modifier_array(myobject, axis, move, repeat, fix=False, fixmove=0, zmove
     if bpy.context.scene.objects.active.name == myobject.name:
         bpy.ops.object.modifier_add(type='ARRAY')
         for mod in myobject.modifiers:
-            if mod.type == 'ARRAY':
-                if mod.name == "Array":
-                    mod.name = "Array_" + axis
-                    mod.count = repeat
-                    mod.use_constant_offset = fix
-                    if axis == "X":
-                        mod.relative_offset_displace[0] = move
-                        mod.constant_offset_displace[0] = fixmove
-                        mod.relative_offset_displace[1] = 0.0
-                        mod.constant_offset_displace[1] = 0.0
-                        mod.relative_offset_displace[2] = 0.0
-                        mod.constant_offset_displace[2] = zmove
+            if mod.type == 'ARRAY' and mod.name == "Array":
+                mod.name = f"Array_{axis}"
+                mod.count = repeat
+                mod.use_constant_offset = fix
+                if axis == "X":
+                    mod.relative_offset_displace[0] = move
+                    mod.constant_offset_displace[0] = fixmove
+                    mod.relative_offset_displace[1] = 0.0
+                    mod.constant_offset_displace[1] = 0.0
+                    mod.relative_offset_displace[2] = 0.0
+                    mod.constant_offset_displace[2] = zmove
 
-                    if axis == "Y":
-                        mod.relative_offset_displace[0] = 0.0
-                        mod.constant_offset_displace[0] = 0.0
-                        mod.relative_offset_displace[1] = move
-                        mod.constant_offset_displace[1] = fixmove
-                        mod.relative_offset_displace[2] = 0.0
-                        mod.constant_offset_displace[2] = 0.0
+                if axis == "Y":
+                    mod.relative_offset_displace[0] = 0.0
+                    mod.constant_offset_displace[0] = 0.0
+                    mod.relative_offset_displace[1] = move
+                    mod.constant_offset_displace[1] = fixmove
+                    mod.relative_offset_displace[2] = 0.0
+                    mod.constant_offset_displace[2] = 0.0
 
 
 # --------------------------------------------------------------------
@@ -308,14 +295,7 @@ def unwrap_mesh(myobject, allfaces=True):
 # Get Node Index(multilanguage support)
 # --------------------------------------------------------------------
 def get_node_index(nodes, datatype):
-    idx = 0
-    for m in nodes:
-        if m.type == datatype:
-            return idx
-        idx += 1
-
-    # by default
-    return 1
+    return next((idx for idx, m in enumerate(nodes) if m.type == datatype), 1)
 
 
 # --------------------------------------------------------------------
@@ -331,7 +311,7 @@ def create_diffuse_material(matname, replace, r, g, b, rv=0.8, gv=0.8, bv=0.8, m
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -420,7 +400,7 @@ def create_translucent_material(matname, replace, r, g, b, rv=0.8, gv=0.8, bv=0.
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -477,7 +457,7 @@ def create_glass_material(matname, replace, rv=0.333, gv=0.342, bv=0.9):
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -561,7 +541,7 @@ def create_transparent_material(matname, replace, r=1, g=1, b=1, alpha=0):
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -602,7 +582,7 @@ def create_glossy_material(matname, replace, r, g, b, rv=0.578, gv=0.555, bv=0.7
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -644,7 +624,7 @@ def create_emission_material(matname, replace, r, g, b, energy):
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -685,7 +665,7 @@ def create_old_glass_material(matname, replace, rv=0.352716, gv=0.760852, bv=0.9
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -763,7 +743,7 @@ def create_brick_material(matname, replace, r, g, b, rv=0.8, gv=0.636, bv=0.315)
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -824,7 +804,7 @@ def create_fabric_material(matname, replace, r, g, b, rv=0.8, gv=0.636, bv=0.315
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -860,11 +840,11 @@ def create_fabric_material(matname, replace, r, g, b, rv=0.8, gv=0.636, bv=0.315
     # Load image file.
 
     realpath = os.path.join(os.path.dirname(__file__), "images", "fabric_diffuse.png")
-    print("Loading: " + realpath)
+    print(f"Loading: {realpath}")
     try:
         img = bpy.data.images.load(realpath)
     except:
-        raise NameError("Cannot load image %s" % realpath)
+        raise NameError(f"Cannot load image {realpath}")
 
     # Create image texture from image
     ctex = bpy.data.textures.new('ColorTex', type='IMAGE')
@@ -919,8 +899,7 @@ def copy_binfile(fromfile, tofile):
     with open(fromfile, 'rb') as f1:
         with open(tofile, 'wb') as f2:
             while True:
-                mybytes = f1.read(1024)
-                if mybytes:
+                if mybytes := f1.read(1024):
                     f2.write(mybytes)
                 else:
                     break    

@@ -57,7 +57,7 @@ def draw_main(context):
     dspname = scene.archimesh_gl_name
     # Get visible layers
     layers = []
-    for x in range(0, 20):
+    for x in range(20):
         if bpy.context.scene.layers[x] is True:
             layers.extend([x])
 
@@ -73,37 +73,36 @@ def draw_main(context):
     for myobj in objlist:
         if myobj.hide is False:
             # verify visible layer
-            for x in range(0, 20):
-                if myobj.layers[x] is True:
-                    if x in layers:
-                        # -----------------------------------------------------
-                        # Rooms
-                        # -----------------------------------------------------
-                        if 'RoomGenerator' in myobj:
-                            op = myobj.RoomGenerator[0]
-                            draw_room_data(myobj, op, region, rv3d, rgb, rgbw, fsize, wfsize, space, measure, dspname)
+            for x in range(20):
+                if myobj.layers[x] is True and x in layers:
+                    # -----------------------------------------------------
+                    # Rooms
+                    # -----------------------------------------------------
+                    if 'RoomGenerator' in myobj:
+                        op = myobj.RoomGenerator[0]
+                        draw_room_data(myobj, op, region, rv3d, rgb, rgbw, fsize, wfsize, space, measure, dspname)
 
-                        # -----------------------------------------------------
-                        # Doors
-                        # -----------------------------------------------------
-                        if 'DoorObjectGenerator' in myobj:
-                            op = myobj.DoorObjectGenerator[0]
-                            draw_door_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
+                    # -----------------------------------------------------
+                    # Doors
+                    # -----------------------------------------------------
+                    if 'DoorObjectGenerator' in myobj:
+                        op = myobj.DoorObjectGenerator[0]
+                        draw_door_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
 
-                        # -----------------------------------------------------
-                        # Window (Rail)
-                        # -----------------------------------------------------
-                        if 'WindowObjectGenerator' in myobj:
-                            op = myobj.WindowObjectGenerator[0]
-                            draw_window_rail_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
+                    # -----------------------------------------------------
+                    # Window (Rail)
+                    # -----------------------------------------------------
+                    if 'WindowObjectGenerator' in myobj:
+                        op = myobj.WindowObjectGenerator[0]
+                        draw_window_rail_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
 
-                        # -----------------------------------------------------
-                        # Window (Panel)
-                        # -----------------------------------------------------
-                        if 'WindowPanelGenerator' in myobj:
-                            op = myobj.WindowPanelGenerator[0]
-                            draw_window_panel_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
-                        break   # avoid unnecessary loops
+                    # -----------------------------------------------------
+                    # Window (Panel)
+                    # -----------------------------------------------------
+                    if 'WindowPanelGenerator' in myobj:
+                        op = myobj.WindowPanelGenerator[0]
+                        draw_window_panel_data(myobj, op, region, rv3d, rgb, fsize, space, measure)
+                    break   # avoid unnecessary loops
     # -----------------------
     # restore opengl defaults
     # -----------------------
@@ -123,10 +122,7 @@ def draw_text(x_pos, y_pos, display_text, rgb, fsize, right=False):
     blf.size(font_id, fsize, 72)
 
     text_width, text_height = blf.dimensions(font_id, display_text)
-    if right is True:
-        newx = x_pos - text_width - gap
-    else:
-        newx = x_pos
+    newx = x_pos - text_width - gap if right is True else x_pos
     blf.position(font_id, newx, y_pos, 0)
     bgl.glColor4f(rgb[0], rgb[1], rgb[2], rgb[3])
     blf.draw(font_id, display_text)
@@ -234,7 +230,7 @@ def draw_room_data(myobj, op, region, rv3d, rgb, rgbw, fsize, wfsize, space, mea
         # Wall Number
         # --------------------------------
         if dspname is True:
-            for i in range(0, op.wall_num):
+            for i in range(op.wall_num):
                 ap = get_point((op.walls[i].glpoint_a[0], op.walls[i].glpoint_a[1], op.walls[i].glpoint_a[2]), myobj)
                 bp = get_point((op.walls[i].glpoint_b[0], op.walls[i].glpoint_b[1], op.walls[i].glpoint_b[2]), myobj)
 

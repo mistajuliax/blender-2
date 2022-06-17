@@ -44,11 +44,8 @@ import os
 # Add to Phyton path (once only)
 # ----------------------------------------------
 path = sys.path
-flag = False
-for item in path:
-    if "archimesh" in item:
-        flag = True
-if flag is False:
+flag = any("archimesh" in item for item in path)
+if not flag:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'archimesh'))
     print("archimesh: added to phytonpath")
 
@@ -267,7 +264,7 @@ def unregister():
     bpy.utils.unregister_class(window_panel.WINPANEL)
     bpy.utils.unregister_class(window_panel.WindowEditPanel)
     bpy.types.INFO_MT_mesh_add.remove(menu_func)
-    
+
     # Remove properties
     del bpy.types.Scene.archimesh_select_only
     del bpy.types.Scene.archimesh_ceiling

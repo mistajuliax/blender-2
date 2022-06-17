@@ -37,13 +37,10 @@ from arch_gltools import *
 # Verify if boolean already exist
 # -----------------------------------------------------
 def isboolean(myobject, childobject):
-    flag = False
-    for mod in myobject.modifiers:
-            if mod.type == 'BOOLEAN':
-                if mod.object == childobject:
-                    flag = True
-                    break
-    return flag        
+    return any(
+        mod.type == 'BOOLEAN' and mod.object == childobject
+        for mod in myobject.modifiers
+    )        
 
 
 # ------------------------------------------------------
@@ -69,9 +66,10 @@ class HoleAction(bpy.types.Operator):
         for obj in bpy.context.scene.objects:
             # noinspection PyBroadException
             try:
-                if obj["archimesh.hole_enable"]:
-                    if obj.select is True or scene.archimesh_select_only is False:
-                        listobj.extend([obj])
+                if obj["archimesh.hole_enable"] and (
+                    obj.select is True or scene.archimesh_select_only is False
+                ):
+                    listobj.extend([obj])
             except:
                 continue
         # ---------------------------
@@ -84,7 +82,7 @@ class HoleAction(bpy.types.Operator):
                 if child["archimesh.room_baseboard"]:
                     mybaseboard = child
             except:
-                continue                
+                continue
         # ---------------------------
         # Get the shell object
         # ---------------------------
@@ -101,9 +99,8 @@ class HoleAction(bpy.types.Operator):
         # Remove all empty Boolean modifiers
         # -----------------------------
         for mod in context.object.modifiers:
-            if mod.type == 'BOOLEAN':
-                if mod.object is None:
-                    bpy.ops.object.modifier_remove(modifier=mod.name)
+            if mod.type == 'BOOLEAN' and mod.object is None:
+                bpy.ops.object.modifier_remove(modifier=mod.name)
 
         # if thickness is 0, must be > 0
         myroom = context.object
@@ -147,18 +144,21 @@ class HoleAction(bpy.types.Operator):
             for obj in bpy.context.scene.objects:
                 # noinspection PyBroadException
                 try:
-                    if obj["archimesh.ctrl_base"]:
-                        if obj.select is True or scene.archimesh_select_only is False:
-                            # add boolean modifier
-                            if isboolean(mybaseboard, obj) is False:
-                                set_modifier_boolean(mybaseboard, obj)
+                    if (
+                        obj["archimesh.ctrl_base"]
+                        and (
+                            obj.select is True
+                            or scene.archimesh_select_only is False
+                        )
+                        and isboolean(mybaseboard, obj) is False
+                    ):
+                        set_modifier_boolean(mybaseboard, obj)
                 except:
                     pass
             # Clear empty booleans
             for mod in mybaseboard.modifiers:
-                if mod.type == 'BOOLEAN':
-                    if mod.object is None:
-                        bpy.ops.object.modifier_remove(modifier=mod.name)
+                if mod.type == 'BOOLEAN' and mod.object is None:
+                    bpy.ops.object.modifier_remove(modifier=mod.name)
 
         # ---------------------------------------
         # Now add the modifiers to shell
@@ -166,25 +166,27 @@ class HoleAction(bpy.types.Operator):
         if myshell is not None:
             # Remove all empty Boolean modifiers
             for mod in myshell.modifiers:
-                if mod.type == 'BOOLEAN':
-                    if mod.object is None:
-                        bpy.ops.object.modifier_remove(modifier=mod.name)
+                if mod.type == 'BOOLEAN' and mod.object is None:
+                    bpy.ops.object.modifier_remove(modifier=mod.name)
 
             for obj in bpy.context.scene.objects:
                 # noinspection PyBroadException
                 try:
-                    if obj["archimesh.ctrl_hole"]:
-                        if obj.select is True or scene.archimesh_select_only is False:
-                            # add boolean modifier
-                            if isboolean(myshell, obj) is False:
-                                set_modifier_boolean(myshell, obj)
+                    if (
+                        obj["archimesh.ctrl_hole"]
+                        and (
+                            obj.select is True
+                            or scene.archimesh_select_only is False
+                        )
+                        and isboolean(myshell, obj) is False
+                    ):
+                        set_modifier_boolean(myshell, obj)
                 except:
                     pass
             # Clear empty booleans
             for mod in myshell.modifiers:
-                if mod.type == 'BOOLEAN':
-                    if mod.object is None:
-                        bpy.ops.object.modifier_remove(modifier=mod.name)
+                if mod.type == 'BOOLEAN' and mod.object is None:
+                    bpy.ops.object.modifier_remove(modifier=mod.name)
 
         return {'FINISHED'}
 

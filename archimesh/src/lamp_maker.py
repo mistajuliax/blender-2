@@ -59,10 +59,7 @@ def set_preset(self):
         self.bz04 = 0.089
         self.bz05 = -0.038
         self.bz06 = -0.165
-    # -----------------------
-    # Pear
-    # -----------------------
-    if self.preset == "2":
+    elif self.preset == "2":
         self.base_height = 0.20
         self.base_segments = 16
         self.base_rings = 6
@@ -81,10 +78,7 @@ def set_preset(self):
         self.bz04 = 0
         self.bz05 = 0
         self.bz06 = 0
-    # -----------------------
-    # Vase
-    # -----------------------
-    if self.preset == "3":
+    elif self.preset == "3":
         self.base_height = 0.20
         self.base_segments = 8
         self.base_rings = 6
@@ -103,10 +97,7 @@ def set_preset(self):
         self.bz04 = 0
         self.bz05 = 0
         self.bz06 = 0
-    # -----------------------
-    # Rectangular
-    # -----------------------
-    if self.preset == "4":
+    elif self.preset == "4":
         self.base_height = 0.15
         self.base_segments = 4
         self.base_rings = 5
@@ -468,7 +459,7 @@ def create_lamp_base(objname, height, px, py, pz, segments, rings, radios, ratio
     h = height / (rings - 1)
     listheight = []
     z = 0
-    for f in range(0, rings):
+    for f in range(rings):
         listheight.extend([z + (z * ratios[f])])
         z += h
 
@@ -491,11 +482,21 @@ def create_lamp_base(objname, height, px, py, pz, segments, rings, radios, ratio
     # Materials
     if mat:
         rgb = objcol
-        mymat = create_diffuse_material(mycylinder.name + "_material", True, rgb[0], rgb[1], rgb[2], rgb[0], rgb[1],
-                                        rgb[2], 0.1)
+        mymat = create_diffuse_material(
+            f"{mycylinder.name}_material",
+            True,
+            rgb[0],
+            rgb[1],
+            rgb[2],
+            rgb[0],
+            rgb[1],
+            rgb[2],
+            0.1,
+        )
+
         set_material(mycylinder, mymat)
 
-    return mycylinder, listheight[len(listheight) - 1]
+    return mycylinder, listheight[-1]
 
 
 # ------------------------------------------------------------------------------
@@ -528,7 +529,18 @@ def create_lampholder(objname, height, px, py, pz, mat):
 
     # Materials
     if mat:
-        mat = create_diffuse_material(mycylinder.name + "_material", True, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.1)
+        mat = create_diffuse_material(
+            f"{mycylinder.name}_material",
+            True,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.1,
+        )
+
         set_material(mycylinder, mat)
 
     return mycylinder
@@ -574,7 +586,18 @@ def create_lampholder_strings(objname, height, px, py, pz, radio, shadeh, mat):
 
     # Materials
     if mat:
-        mat = create_diffuse_material(mycylinder.name + "_material", True, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.1)
+        mat = create_diffuse_material(
+            f"{mycylinder.name}_material",
+            True,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.1,
+        )
+
         set_material(mycylinder, mat)
         set_material(box1, mat)
         set_material(box2, mat)
@@ -620,8 +643,18 @@ def create_lampshade(objname, height, px, py, pz, segments, radio1, radio2, plea
     mycylinder.location.z = pz
     # materials
     if mat:
-        mymat = create_translucent_material(mycylinder.name + "_material", True, 0.8, 0.65, 0.45, 0.8, 0.65, 0.45,
-                                            opacity)
+        mymat = create_translucent_material(
+            f"{mycylinder.name}_material",
+            True,
+            0.8,
+            0.65,
+            0.45,
+            0.8,
+            0.65,
+            0.45,
+            opacity,
+        )
+
         set_material(mycylinder, mymat)
 
     return mycylinder

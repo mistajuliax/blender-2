@@ -137,7 +137,7 @@ class SHELVES(bpy.types.Operator):
             row.prop(self, 'shelves_num')
             # Add menu for shelves
             if self.shelves_num > 0:
-                for idx in range(0, self.shelves_num):
+                for idx in range(self.shelves_num):
                     box = layout.box()
                     add_shelves(self, box, idx + 1, self.shelves[idx])
 
@@ -154,7 +154,7 @@ class SHELVES(bpy.types.Operator):
     def execute(self, context):
         if bpy.context.mode == "OBJECT":
             # Create all elements
-            for i in range(len(self.shelves)-1, self.shelves_num):
+            for _ in range(len(self.shelves)-1, self.shelves_num):
                 self.shelves.add()
 
             # Create shelves    
@@ -170,7 +170,7 @@ class SHELVES(bpy.types.Operator):
 # -----------------------------------------------------
 def add_shelves(self, box, num, sh):
     row = box.row()
-    row.label("Unit " + str(num))
+    row.label(f"Unit {str(num)}")
     row.prop(sh, 'sX')
 
     row = box.row()
@@ -255,18 +255,39 @@ def generate_shelves(self):
     # ------------------------------------------------------------------------------
     # Shelves
     # ------------------------------------------------------------------------------
-    for i in range(0, self.shelves_num):
-        mydata = create_unit(self.stype, "Shelves" + str(i + 1),
-                             self.thickness, self.sthickness,
-                             self.shelves[i].sX, self.depth + self.shelves[i].wY, self.height + self.shelves[i].wZ,
-                             self.shelves[i].pX + lastx, myloc[1] + self.shelves[i].pY, myloc[2] + self.shelves[i].pZ,
-                             self.shelves[i].left, self.shelves[i].right,
-                             self.shelves[i].sNum,
-                             (self.shelves[i].Z01, self.shelves[i].Z02, self.shelves[i].Z03,
-                              self.shelves[i].Z04, self.shelves[i].Z05, self.shelves[i].Z06,
-                              self.shelves[i].Z07, self.shelves[i].Z08, self.shelves[i].Z09,
-                              self.shelves[i].Z10, self.shelves[i].Z11, self.shelves[i].Z12),
-                             self.top, self.bottom)
+    for i in range(self.shelves_num):
+        mydata = create_unit(
+            self.stype,
+            f"Shelves{str(i + 1)}",
+            self.thickness,
+            self.sthickness,
+            self.shelves[i].sX,
+            self.depth + self.shelves[i].wY,
+            self.height + self.shelves[i].wZ,
+            self.shelves[i].pX + lastx,
+            myloc[1] + self.shelves[i].pY,
+            myloc[2] + self.shelves[i].pZ,
+            self.shelves[i].left,
+            self.shelves[i].right,
+            self.shelves[i].sNum,
+            (
+                self.shelves[i].Z01,
+                self.shelves[i].Z02,
+                self.shelves[i].Z03,
+                self.shelves[i].Z04,
+                self.shelves[i].Z05,
+                self.shelves[i].Z06,
+                self.shelves[i].Z07,
+                self.shelves[i].Z08,
+                self.shelves[i].Z09,
+                self.shelves[i].Z10,
+                self.shelves[i].Z11,
+                self.shelves[i].Z12,
+            ),
+            self.top,
+            self.bottom,
+        )
+
         boxes.extend([mydata[0]])
         lastx = mydata[1]
 
@@ -335,8 +356,7 @@ def create_unit(stype, objname, thickness, sthickness, sx, sy, sz, px, py, pz, l
                             (v, v + 1, v + 5, v + 4),
                             (v + 3, v + 2, v + 6, v + 7), (v + 1, v + 2, v + 6, v + 5)])
             v += 8
-        # Four legs
-        if stype == "4":
+        elif stype == "4":
             # back
             myvertex.extend([(0, 0, 0), (0, -thickness, 0), (0, -thickness, sz), (0, 0, sz),
                              (thickness, 0, 0), (thickness, -thickness, 0), (thickness, -thickness, sz),
@@ -367,8 +387,7 @@ def create_unit(stype, objname, thickness, sthickness, sx, sy, sz, px, py, pz, l
             myfaces.extend([(v, v + 1, v + 2, v + 3), (v + 4, v + 5, v + 6, v + 7), (v, v + 4, v + 7, v + 3),
                             (v, v + 1, v + 5, v + 4), (v + 3, v + 2, v + 6, v + 7), (v + 1, v + 2, v + 6, v + 5)])
             v += 8
-        # Four legs
-        if stype == "4":
+        elif stype == "4":
             # back
             myvertex.extend([(width, 0, 0), (width, -thickness, 0), (width, -thickness, sz), (width, 0, sz),
                              (width + thickness, 0, 0), (width + thickness, -thickness, 0),
@@ -390,16 +409,12 @@ def create_unit(stype, objname, thickness, sthickness, sx, sy, sz, px, py, pz, l
     posx = 0
     # calculate width
     width = sx - thickness
-    posx = posx + thickness
+    posx += thickness
 
     # calculate vertical spaces
     dist = sz - top - bottom - sthickness
     # if only top/bottom the space is not necessary
-    if shelves > 2:
-        space = dist / (shelves - 1)
-    else:
-        space = 0
-
+    space = dist / (shelves - 1) if shelves > 2 else 0
     posz1 = bottom
 
     for x in range(shelves):

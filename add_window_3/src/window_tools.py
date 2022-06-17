@@ -67,14 +67,7 @@ def remove_doubles(myobject):
 # Get Node Index(multilanguage support)
 # --------------------------------------------------------------------
 def get_node_index(nodes, datatype):
-    idx = 0
-    for m in nodes:
-        if m.type == datatype:
-            return idx
-        idx += 1
-
-    # by default
-    return 1
+    return next((idx for idx, m in enumerate(nodes) if m.type == datatype), 1)
 
 
 # --------------------------------------------------------------------
@@ -90,7 +83,7 @@ def create_diffuse_material(matname, replace, r, g, b, rv=0.8, gv=0.8, bv=0.8, m
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)
@@ -179,7 +172,7 @@ def create_glass_material(matname, replace, rv=0.352716, gv=0.760852, bv=0.9):
     # Create material
     scn = bpy.context.scene
     # Set cycles render engine if not selected
-    if not scn.render.engine == 'CYCLES':
+    if scn.render.engine != 'CYCLES':
         scn.render.engine = 'CYCLES'
 
     mat = bpy.data.materials.new(matname)

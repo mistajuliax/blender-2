@@ -99,7 +99,7 @@ def set_defaults(s):
         s.k00 = True
         s.k01 = False
         s.k02 = True
-    if s.prs == '2':
+    elif s.prs == '2':
         s.gen = 3
         s.yuk = 1
         s.kl1 = 5
@@ -113,7 +113,7 @@ def set_defaults(s):
         s.k00 = True
         s.k01 = False
         s.k02 = True
-    if s.prs == '3':
+    elif s.prs == '3':
         s.gen = 3
         s.yuk = 1
         s.kl1 = 5
@@ -127,7 +127,7 @@ def set_defaults(s):
         s.k00 = True
         s.k01 = False
         s.k02 = True
-    if s.prs == '4':
+    elif s.prs == '4':
         s.gen = 3
         s.yuk = 1
         s.kl1 = 5
@@ -141,7 +141,7 @@ def set_defaults(s):
         s.k00 = True
         s.k01 = False
         s.k02 = True
-    if s.prs == '5':
+    elif s.prs == '5':
         s.gen = 3
         s.yuk = 1
         s.kl1 = 5
@@ -155,7 +155,7 @@ def set_defaults(s):
         s.k00 = True
         s.k01 = False
         s.k02 = True
-    if s.prs == '6':
+    elif s.prs == '6':
         s.gen = 1
         s.yuk = 1
         s.kl1 = 5
@@ -165,7 +165,7 @@ def set_defaults(s):
         s.mr = True
         s.gnx0 = 40
         s.k00 = False
-    if s.prs == '7':
+    elif s.prs == '7':
         s.gen = 1
         s.yuk = 2
         s.kl1 = 5
@@ -177,7 +177,7 @@ def set_defaults(s):
         s.k00 = True
         s.k10 = False
         s.mr = False
-    if s.prs == '8':
+    elif s.prs == '8':
         s.gen = 1
         s.yuk = 2
         s.kl1 = 5

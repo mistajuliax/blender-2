@@ -200,7 +200,7 @@ def create_stairs(self, objname):
     index = 0
 
     lastpoint = (0, 0, 0)
-    for s in range(0, self.step_num):
+    for s in range(self.step_num):
         if self.model == "1":
             mydata = create_rect_step(self, lastpoint, myvertex, myfaces, index, s)
         if self.model == "2":

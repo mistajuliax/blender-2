@@ -183,11 +183,7 @@ def shape_mesh_and_create_children(mainobject, update=False):
     mycurver = create_bezier("String.R", myp, (0, 0, 0))
     mycurver.parent = myslats
 
-    if mp.width < 0.60:
-        sep = 0.058
-    else:
-        sep = 0.148
-
+    sep = 0.058 if mp.width < 0.60 else 0.148
     mycurvel.location.x = (mp.width / 2) - sep
     mycurvel.location.y = 0
     mycurvel.location.z = 0
@@ -219,11 +215,7 @@ def shape_mesh_and_create_children(mainobject, update=False):
     mycurverf = create_bezier("String.f.R", myp, (0, 0, 0), 0.001, 'FRONT')
     mycurverf.parent = myslats
 
-    if mp.width < 0.60:
-        sep = 0.058
-    else:
-        sep = 0.148
-
+    sep = 0.058 if mp.width < 0.60 else 0.148
     mycurvelf.location.x = (mp.width / 2) - sep
     mycurvelf.location.y = ((-mp.depth / 2) * math.cos(math.radians(mp.angle))) - 0.001
     mycurvelf.location.z = 0
@@ -256,11 +248,7 @@ def shape_mesh_and_create_children(mainobject, update=False):
     mycurverb = create_bezier("String.b.R", myp, (0, 0, 0), 0.001, 'BACK')
     mycurverb.parent = myslats
 
-    if mp.width < 0.60:
-        sep = 0.058
-    else:
-        sep = 0.148
-
+    sep = 0.058 if mp.width < 0.60 else 0.148
     mycurvelb.location.x = (mp.width / 2) - sep
     mycurvelb.location.y = ((mp.depth / 2) * math.cos(math.radians(mp.angle))) + 0.001
     mycurvelb.location.z = 0
@@ -373,10 +361,7 @@ class VenetianObjectgeneratorpanel(bpy.types.Panel):
         o = context.object
         if o is None:
             return False
-        if 'VenetianObjectGenerator' not in o:
-            return False
-        else:
-            return True
+        return 'VenetianObjectGenerator' in o
 
 # -----------------------------------------------------
     # Draw (create UI interface)
@@ -396,11 +381,12 @@ class VenetianObjectgeneratorpanel(bpy.types.Panel):
         else:
             myobjdat = o.VenetianObjectGenerator[0]
             space = bpy.context.space_data
-            if not space.local_view:
-                # Imperial units warning
-                if bpy.context.scene.unit_settings.system == "IMPERIAL":
-                    row = layout.row()
-                    row.label("Warning: Imperial units not supported", icon='COLOR_RED')
+            if (
+                not space.local_view
+                and bpy.context.scene.unit_settings.system == "IMPERIAL"
+            ):
+                row = layout.row()
+                row.label("Warning: Imperial units not supported", icon='COLOR_RED')
 
             box = layout.box()
             row = box.row()
@@ -485,11 +471,7 @@ def create_slat_mesh(objname, width, depth, height, angle, ratio):
         myvertex.extend(mydata[0])
         myfaces.extend(mydata[1])
         v = mydata[2]
-        if x < collapsedslats:
-            posz -= separation
-        else:
-            posz -= gap
-            # Transition to horizontal
+        posz -= separation if x < collapsedslats else gap
         if angleused == angle / 2:
             sinheight = math.sin(math.radians(angle / 2)) * depth / 2
             posz -= sinheight

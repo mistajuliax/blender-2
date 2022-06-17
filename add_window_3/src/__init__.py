@@ -43,11 +43,8 @@ import os
 # Add to Phyton path (once only)
 # ----------------------------------------------
 path = sys.path
-flag = False
-for item in path:
-    if "add_window" in item:
-        flag = True
-if flag is False:
+flag = any("add_window" in item for item in path)
+if not flag:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'add_window'))
     print("add_window: added to phytonpath")
 

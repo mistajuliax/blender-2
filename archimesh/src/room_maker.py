@@ -70,66 +70,64 @@ class ExportRoom(bpy.types.Operator, ExportHelper):
             # extract path and filename 
             # -------------------------------
             (filepath, filename) = os.path.split(self.properties.filepath)
-            print('Exporting %s' % filename)
+            print(f'Exporting {filename}')
             # -------------------------------
             # Open output file
             # -------------------------------
             realpath = os.path.realpath(os.path.expanduser(self.properties.filepath))
-            fout = open(realpath, 'w')
+            with open(realpath, 'w') as fout:
+                st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                fout.write("# Archimesh room export data\n")
+                fout.write(f"# {st}" + "\n")
+                fout.write("#======================================================\n")
 
-            st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-            fout.write("# Archimesh room export data\n")
-            fout.write("# " + st + "\n")
-            fout.write("#======================================================\n")
+                fout.write(f"name={myobj.name}" + "\n")
+                fout.write(f"height={str(round(mydata.room_height, 3))}" + "\n")
+                fout.write(f"thickness={str(round(mydata.wall_width, 3))}" + "\n")
+                fout.write(f"inverse={str(mydata.inverse)}" + "\n")
+                fout.write(f"ceiling={str(mydata.ceiling)}" + "\n")
+                fout.write(f"floor={str(mydata.floor)}" + "\n")
+                fout.write(f"close={str(mydata.merge)}" + "\n")
 
-            fout.write("name=" + myobj.name + "\n")
-            fout.write("height=" + str(round(mydata.room_height, 3)) + "\n")
-            fout.write("thickness=" + str(round(mydata.wall_width, 3)) + "\n")
-            fout.write("inverse=" + str(mydata.inverse) + "\n")
-            fout.write("ceiling=" + str(mydata.ceiling) + "\n")
-            fout.write("floor=" + str(mydata.floor) + "\n")
-            fout.write("close=" + str(mydata.merge) + "\n")
+                # Walls
+                fout.write("#\n# Walls\n#\n")
+                fout.write(f"walls={str(mydata.wall_num)}" + "\n")
+                i = 0
+                for w in mydata.walls:
+                    if i < mydata.wall_num:
+                        i += 1
+                        fout.write(f"w={str(round(w.w, 3))}")
+                                        # if w.a == True: # advance
+                        fout.write(f",a={str(w.a)},")
+                        fout.write(f"r={str(round(w.r, 1))},")
+                        fout.write(f"h={str(w.h)},")
+                        fout.write(f"m={str(round(w.m, 3))},")
+                        fout.write(f"f={str(round(w.f, 3))},")
+                        fout.write(f"c={str(w.curved)},")
+                        fout.write(f"cf={str(round(w.curve_factor, 1))},")
+                        fout.write(f"cd={str(round(w.curve_arc_deg, 1))},")
+                        fout.write(f"cs={str(w.curve_steps)}" + "\n")
+                                    # else:
+                                    # fOut.write("\n")
 
-            # Walls
-            fout.write("#\n# Walls\n#\n")
-            fout.write("walls=" + str(mydata.wall_num) + "\n")
-            i = 0
-            for w in mydata.walls:
-                if i < mydata.wall_num:
-                    i += 1
-                    fout.write("w=" + str(round(w.w, 3)))
-                    # if w.a == True: # advance
-                    fout.write(",a=" + str(w.a) + ",")
-                    fout.write("r=" + str(round(w.r, 1)) + ",")
-                    fout.write("h=" + str(w.h) + ",")
-                    fout.write("m=" + str(round(w.m, 3)) + ",")
-                    fout.write("f=" + str(round(w.f, 3)) + ",")
-                    fout.write("c=" + str(w.curved) + ",")
-                    fout.write("cf=" + str(round(w.curve_factor, 1)) + ",")
-                    fout.write("cd=" + str(round(w.curve_arc_deg, 1)) + ",")
-                    fout.write("cs=" + str(w.curve_steps) + "\n")
-                    # else:
-                    # fOut.write("\n")
+                # Baseboard
+                fout.write("#\n# Baseboard\n#\n")
+                fout.write(f"baseboard={str(mydata.baseboard)}" + "\n")
+                fout.write(f"baseh={str(round(mydata.base_height, 3))}" + "\n")
+                fout.write(f"baset={str(round(mydata.base_width, 3))}" + "\n")
+                # Shell
+                fout.write("#\n# Wall Cover\n#\n")
+                fout.write(f"shell={str(mydata.shell)}" + "\n")
+                fout.write(f"shellh={str(round(mydata.shell_height, 3))}" + "\n")
+                fout.write(f"shellt={str(round(mydata.shell_thick, 3))}" + "\n")
+                fout.write(f"shellf={str(round(mydata.shell_factor, 3))}" + "\n")
+                fout.write(f"shellb={str(round(mydata.shell_bfactor, 3))}" + "\n")
 
-            # Baseboard
-            fout.write("#\n# Baseboard\n#\n")
-            fout.write("baseboard=" + str(mydata.baseboard) + "\n")
-            fout.write("baseh=" + str(round(mydata.base_height, 3)) + "\n")
-            fout.write("baset=" + str(round(mydata.base_width, 3)) + "\n")
-            # Shell
-            fout.write("#\n# Wall Cover\n#\n")
-            fout.write("shell=" + str(mydata.shell) + "\n")
-            fout.write("shellh=" + str(round(mydata.shell_height, 3)) + "\n")
-            fout.write("shellt=" + str(round(mydata.shell_thick, 3)) + "\n")
-            fout.write("shellf=" + str(round(mydata.shell_factor, 3)) + "\n")
-            fout.write("shellb=" + str(round(mydata.shell_bfactor, 3)) + "\n")
+                # Materials
+                fout.write("#\n# Materials\n#\n")
+                fout.write(f"materials={str(mydata.crt_mat)}" + "\n")
 
-            # Materials
-            fout.write("#\n# Materials\n#\n")
-            fout.write("materials=" + str(mydata.crt_mat) + "\n")
-
-            fout.close()
-            self.report({'INFO'}, realpath + "successfully exported")
+            self.report({'INFO'}, f"{realpath}successfully exported")
         except:
             self.report({'ERROR'}, "Unable to export room data")
 
@@ -172,121 +170,86 @@ class ImportRoom(bpy.types.Operator, ImportHelper):
         # noinspection PyBroadException
         try:
             realpath = os.path.realpath(os.path.expanduser(self.properties.filepath))
-            finput = open(realpath)
-            line = finput.readline()
-
-            myobj = bpy.context.active_object
-            mydata = myobj.RoomGenerator[0]
-            # ----------------------------------         
-            # Loop all records from file
-            # ----------------------------------
-            idx = 0  # index of each wall
-            while line:
-                if line[:1] != '#':
-                    if "name=" in line.lower():
-                        myobj.name = line[5:-1]
-
-                    elif "height=" in line.lower():
-                        mydata.room_height = float(line[7:-1])
-
-                    elif "thickness=" in line.lower():
-                        mydata.wall_width = float(line[10:-1])
-
-                    elif "inverse=" in line.lower():
-                        if line[8:-4].upper() == "T":
-                            mydata.inverse = True
-                        else:
-                            mydata.inverse = False
-
-                    elif "ceiling=" in line.lower():
-                        if line[8:-4].upper() == "T":
-                            mydata.ceiling = True
-                        else:
-                            mydata.ceiling = False
-
-                    elif "floor=" in line.lower():
-                        if line[6:-4].upper() == "T":
-                            mydata.floor = True
-                        else:
-                            mydata.floor = False
-
-                    elif "close=" in line.lower():
-                        if line[6:-4].upper() == "T":
-                            mydata.merge = True
-                        else:
-                            mydata.merge = False
-                    elif "baseboard=" in line.lower():
-                        if line[10:-4].upper() == "T":
-                            mydata.baseboard = True
-                        else:
-                            mydata.baseboard = False
-                    elif "baseh=" in line.lower():
-                        mydata.base_height = float(line[6:-1])
-                    elif "baset=" in line.lower():
-                        mydata.base_width = float(line[6:-1])
-                    elif "shell=" in line.lower():
-                        if line[6:-4].upper() == "T":
-                            mydata.shell = True
-                        else:
-                            mydata.shell = False
-                    elif "shellh=" in line.lower():
-                        mydata.shell_height = float(line[7:-1])
-                    elif "shellt=" in line.lower():
-                        mydata.shell_thick = float(line[6:-1])
-                    elif "shellf=" in line.lower():
-                        mydata.shell_factor = float(line[6:-1])
-                    elif "shellb=" in line.lower():
-                        mydata.shell_bfactor = float(line[6:-1])
-                    elif "walls=" in line.lower():
-                        mydata.wall_num = int(line[6:-1])
-
-                    # ---------------------
-                    # Walls Data
-                    # ---------------------
-                    elif "w=" in line.lower() and idx < mydata.wall_num:
-                        # get all pieces
-                        buf = line[:-1] + ","
-                        s = buf.split(",")
-                        for e in s:
-                            param = e.lower()
-                            if "w=" in param:
-                                mydata.walls[idx].w = float(e[2:])
-                            elif "a=" in param:
-                                if "true" == param[2:]:
-                                    mydata.walls[idx].a = True
-                                else:
-                                    mydata.walls[idx].a = False
-                            elif "r=" in param:
-                                mydata.walls[idx].r = float(e[2:])
-                            elif "h=" in param:
-                                mydata.walls[idx].h = e[2:]
-                            elif "m=" in param:
-                                mydata.walls[idx].m = float(e[2:])
-                            elif "f=" == param[0:2]:
-                                mydata.walls[idx].f = float(e[2:])
-                            elif "c=" in param:
-                                if "true" == param[2:]:
-                                    mydata.walls[idx].curved = True
-                                else:
-                                    mydata.walls[idx].curved = False
-                            elif "cf=" in param:
-                                mydata.walls[idx].curve_factor = float(e[3:])
-                            elif "cd=" in param:
-                                mydata.walls[idx].curve_arc_deg = float(e[3:])
-                            elif "cs=" in param:
-                                mydata.walls[idx].curve_steps = int(e[3:])
-                        idx += 1
-
-                    elif "materials=" in line.lower():
-                        if line[10:-4].upper() == "T":
-                            mydata.crt_mat = True
-                        else:
-                            mydata.crt_mat = False
-
+            with open(realpath) as finput:
                 line = finput.readline()
 
-            finput.close()
-            self.report({'INFO'}, realpath + "successfully imported")
+                myobj = bpy.context.active_object
+                mydata = myobj.RoomGenerator[0]
+                # ----------------------------------         
+                # Loop all records from file
+                # ----------------------------------
+                idx = 0  # index of each wall
+                while line:
+                    if line[:1] != '#':
+                        if "name=" in line.lower():
+                            myobj.name = line[5:-1]
+
+                        elif "height=" in line.lower():
+                            mydata.room_height = float(line[7:-1])
+
+                        elif "thickness=" in line.lower():
+                            mydata.wall_width = float(line[10:-1])
+
+                        elif "inverse=" in line.lower():
+                            mydata.inverse = line[8:-4].upper() == "T"
+                        elif "ceiling=" in line.lower():
+                            mydata.ceiling = line[8:-4].upper() == "T"
+                        elif "floor=" in line.lower():
+                            mydata.floor = line[6:-4].upper() == "T"
+                        elif "close=" in line.lower():
+                            mydata.merge = line[6:-4].upper() == "T"
+                        elif "baseboard=" in line.lower():
+                            mydata.baseboard = line[10:-4].upper() == "T"
+                        elif "baseh=" in line.lower():
+                            mydata.base_height = float(line[6:-1])
+                        elif "baset=" in line.lower():
+                            mydata.base_width = float(line[6:-1])
+                        elif "shell=" in line.lower():
+                            mydata.shell = line[6:-4].upper() == "T"
+                        elif "shellh=" in line.lower():
+                            mydata.shell_height = float(line[7:-1])
+                        elif "shellt=" in line.lower():
+                            mydata.shell_thick = float(line[6:-1])
+                        elif "shellf=" in line.lower():
+                            mydata.shell_factor = float(line[6:-1])
+                        elif "shellb=" in line.lower():
+                            mydata.shell_bfactor = float(line[6:-1])
+                        elif "walls=" in line.lower():
+                            mydata.wall_num = int(line[6:-1])
+
+                        elif "w=" in line.lower() and idx < mydata.wall_num:
+                                                # get all pieces
+                            buf = f"{line[:-1]},"
+                            s = buf.split(",")
+                            for e in s:
+                                param = e.lower()
+                                if "w=" in param:
+                                    mydata.walls[idx].w = float(e[2:])
+                                elif "a=" in param:
+                                    mydata.walls[idx].a = param[2:] == "true"
+                                elif "r=" in param:
+                                    mydata.walls[idx].r = float(e[2:])
+                                elif "h=" in param:
+                                    mydata.walls[idx].h = e[2:]
+                                elif "m=" in param:
+                                    mydata.walls[idx].m = float(e[2:])
+                                elif param[:2] == "f=":
+                                    mydata.walls[idx].f = float(e[2:])
+                                elif "c=" in param:
+                                    mydata.walls[idx].curved = param[2:] == "true"
+                                elif "cf=" in param:
+                                    mydata.walls[idx].curve_factor = float(e[3:])
+                                elif "cd=" in param:
+                                    mydata.walls[idx].curve_arc_deg = float(e[3:])
+                                elif "cs=" in param:
+                                    mydata.walls[idx].curve_steps = int(e[3:])
+                            idx += 1
+
+                        elif "materials=" in line.lower():
+                            mydata.crt_mat = line[10:-4].upper() == "T"
+                    line = finput.readline()
+
+            self.report({'INFO'}, f"{realpath}successfully imported")
         except:
             self.report({'ERROR'}, "Unable to import room data")
 
@@ -466,7 +429,7 @@ def shape_walls_and_create_children(myroom, update=False):
     set_normals(myroom, not rp.inverse)  # inside/outside
 
     if rp.wall_width > 0.0:
-        if False == update or is_solidify(myroom) is False:
+        if update == False or is_solidify(myroom) is False:
             set_modifier_solidify(myroom, get_blendunits(rp.wall_width))
         else:
             for mod in myroom.modifiers:

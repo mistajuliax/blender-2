@@ -72,25 +72,23 @@ class ExportInventory(bpy.types.Operator, ExportHelper):
             # extract path and filename 
             # -------------------------------
             (filepath, filename) = os.path.split(self.properties.filepath)
-            print('Exporting %s' % filename)
+            print(f'Exporting {filename}')
             # -------------------------------
             # Open output file
             # -------------------------------
             realpath = os.path.realpath(os.path.expanduser(self.properties.filepath))
-            fout = open(realpath, 'w')
-                
-            st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-            fout.write("# Archimesh kitchen inventory\n")
-            fout.write("# " + st + "\n")
-            mylist = getinventory()
-            for e in mylist:
-                fout.write(e + "\n")
-    
-            fout.close()
-            self.report({'INFO'}, realpath + "successfully exported")
+            with open(realpath, 'w') as fout:
+                st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                fout.write("# Archimesh kitchen inventory\n")
+                fout.write(f"# {st}" + "\n")
+                mylist = getinventory()
+                for e in mylist:
+                    fout.write(e + "\n")
+
+            self.report({'INFO'}, f"{realpath}successfully exported")
         except:
             e = sys.exc_info()[0]
-            self.report({'ERROR'}, "Unable to export inventory " + e)
+            self.report({'ERROR'}, f"Unable to export inventory {e}")
 
         return {'FINISHED'}
 
@@ -161,14 +159,14 @@ def getinventory():
             th = float(u[29:35])
 
             key = "%0.2f x %0.2f x %0.3f" % (w - (th * 2), float(u[15:21]) - th, th)  # subtract board thickness
-            
+
             if key not in shelves:
                 shelves.extend([key])
                 shelvestot.extend([n])
             else:
                 x = shelves.index(key)
                 shelvestot[x] += n
-                 
+
     # ----------------------------------------
     # Get Countertop size
     # "T%06.3fx%06.3fx%06.3f-%06.3f"
@@ -184,7 +182,7 @@ def getinventory():
                 z += float(u[22:28])
         except:
             pass
-             
+
     # ----------------------------------------
     # Get Baseboard size
     # ----------------------------------------
@@ -199,23 +197,18 @@ def getinventory():
                 btxt = "%0.3f x %0.3f" % (float(u[8:14]), float(u[15:21]))
         except:
             pass
-             
+
     # ----------------------------------------
     # Prepare output data
     # ----------------------------------------
-    output = []
-    output.extend(["Units\tDescription\tDimensions"])
-    for i in range(0, len(boxes)):
-        if boxes[i][:1] == "F":
-            typ = "Floor unit\t"
-        else:
-            typ = "Wall unit\t"
-
+    output = ["Units\tDescription\tDimensions"]
+    for i in range(len(boxes)):
+        typ = "Floor unit\t" if boxes[i][:1] == "F" else "Wall unit\t"
         txt = "%0.2f x %0.2f x %0.2f" % (float(boxes[i][1:7]), float(boxes[i][8:14]), float(boxes[i][15:21]))
         output.extend([str(boxestot[i]) + "\t" + typ + txt])
 
-    for i in range(0, len(door)):
-        if door[i][:1] == "D" or door[i][:1] == "L":
+    for i in range(len(door)):
+        if door[i][:1] in ["D", "L"]:
             typ = "Solid door\t"
         elif door[i][:1] == "G":
             typ = "Glass door\t"
@@ -227,7 +220,7 @@ def getinventory():
         txt = "%0.3f x %0.3f" % (float(door[i][1:7]), float(door[i][8:14]))
         output.extend([str(doortot[i]) + "\t" + typ + txt])
 
-    for i in range(0, len(shelves)):
+    for i in range(len(shelves)):
         output.extend([str(shelvestot[i]) + "\tShelf\t" + shelves[i]])
 
     output.extend([str(handles) + "\tHandle"])
@@ -417,7 +410,7 @@ class KITCHEN(bpy.types.Operator):
             row.prop(self, 'cabinet_num')
             # Add menu for cabinets
             if self.cabinet_num > 0:
-                for idx in range(0, self.cabinet_num):
+                for idx in range(self.cabinet_num):
                     box = layout.box()
                     add_cabinet(self, box, idx + 1, self.cabinets[idx])
 
@@ -435,17 +428,17 @@ class KITCHEN(bpy.types.Operator):
         if bpy.context.mode == "OBJECT":
             # Set default values
             if self.oldtype != self.type_cabinet:
-                if self.type_cabinet == "1":  # Floor
+                if self.type_cabinet == "1":
                     self.depth = 0.59
                     self.height = 0.70
 
-                if self.type_cabinet == "2":  # Wall
+                elif self.type_cabinet == "2":
                     self.depth = 0.35
                     self.height = 0.70
                 self.oldtype = self.type_cabinet
 
             # Create all elements
-            for i in range(len(self.cabinets) - 1, self.cabinet_num):
+            for _ in range(len(self.cabinets) - 1, self.cabinet_num):
                 self.cabinets.add()
 
             # Create cabinets
@@ -462,7 +455,7 @@ class KITCHEN(bpy.types.Operator):
 def add_cabinet(self, box, num, cabinet):
     doortype = cabinet.dType
     row = box.row()
-    row.label("Cabinet " + str(num))
+    row.label(f"Cabinet {str(num)}")
     row.prop(cabinet, 'sX')
 
     row = box.row()
@@ -482,7 +475,7 @@ def add_cabinet(self, box, num, cabinet):
     else:
         row.prop(cabinet, 'sNum')  # shelves number
     # Glass ratio
-    if doortype == "4" or doortype == "5" or doortype == "6" or doortype == "11":
+    if doortype in ["4", "5", "6", "11"]:
         row.prop(cabinet, 'gF', slider=True)  # shelves number
     # Handle
     row = box.row()

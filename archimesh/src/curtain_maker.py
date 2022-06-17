@@ -248,10 +248,10 @@ def generate_japan(self):
     posy = 0.006
     posz = 0.006
     for x in range(self.num):
-        mysup = create_japan_support("Support_" + str(x) + ".L",
-                                     width - 0.02,    # subtract 2 cm
-                                     0, 0, 0,
-                                     self.crt_mat)
+        mysup = create_japan_support(
+            f"Support_{str(x)}.L", width - 0.02, 0, 0, 0, self.crt_mat
+        )
+
         support.extend([mysup])
         mysup.parent = myrail
 
@@ -282,10 +282,10 @@ def generate_japan(self):
         posy = 0.006
         posz = 0.006
         for x in range(self.num):
-            mysup = create_japan_support("Support_" + str(x) + ".R",
-                                         width - 0.02,   # subtract 2 cm
-                                         0, 0, 0,
-                                         self.crt_mat)
+            mysup = create_japan_support(
+                f"Support_{str(x)}.R", width - 0.02, 0, 0, 0, self.crt_mat
+            )
+
             support.extend([mysup])
             mysup.parent = myrail
 
@@ -321,10 +321,17 @@ def generate_japan(self):
                                            0.653, 0.485, 0.265)
 
     for sup in support:
-        mypanel = create_japan_panel("Panel_" + str(x),
-                                     width, self.height,
-                                     0, 0, 0,
-                                     self.crt_mat, fabricmat)
+        mypanel = create_japan_panel(
+            f"Panel_{str(x)}",
+            width,
+            self.height,
+            0,
+            0,
+            0,
+            self.crt_mat,
+            fabricmat,
+        )
+
         panel.extend([mypanel])
         mypanel.parent = sup
         mypanel.location.x = posx
@@ -338,10 +345,7 @@ def generate_japan(self):
     y = myrail.location.y
     z = myrail.location.z
 
-    long = -1
-    if self.height < 1:
-        long = -self.height
-
+    long = -self.height if self.height < 1 else -1
     myp = [((0, 0, 0), (- 0.25, 0, 0), (0.0, 0, 0)),
            ((0, 0, long), (- 0.01, 0, long), (0.25, 0, long))]  # double element
     mycurve1 = create_bezier("String_1", myp, (x, y, z))

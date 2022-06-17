@@ -169,11 +169,7 @@ def shape_mesh_and_create_children(mainobject, update=False):
     set_normals(mainobject)
 
     # saves OpenGL data
-    if mp.blind is True:
-        plus = mp.blind_height
-    else:
-        plus = 0
-
+    plus = mp.blind_height if mp.blind is True else 0
     mp.glpoint_a = (-mp.width/2, 0, 0)
     mp.glpoint_b = (-mp.width/2, 0, mp.height + plus)
     mp.glpoint_c = (mp.width/2, 0, mp.height + plus)
@@ -200,8 +196,8 @@ def shape_mesh_and_create_children(mainobject, update=False):
     z = 0
     if mp.blind is True:
         y = mp.blind_rail
-    if mp.blind is True and mp.blind_box is True:
-        z = mp.blind_height
+        if mp.blind_box is True:
+            z = mp.blind_height
 
     myctrl = create_control_box("CTRL_Hole",
                                 mp.width - gap,
@@ -329,10 +325,7 @@ class WindowObjectgeneratorpanel(bpy.types.Panel):
         o = context.object
         if o is None:
             return False
-        if 'WindowObjectGenerator' not in o:
-            return False
-        else:
-            return True
+        return 'WindowObjectGenerator' in o
 
 # -----------------------------------------------------
     # Draw (create UI interface)
